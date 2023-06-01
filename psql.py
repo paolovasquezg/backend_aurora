@@ -5,22 +5,25 @@ import os
 
 load_dotenv()
 
+
 db_name = os.getenv('PSQL_DATABASE')
+db_name2 = os.getenv('PSQL_DATABASE2')
 password = os.getenv('PSQL_PASSWORD')
 host = os.getenv('PSQL_HOST')
 user = os.getenv('PSQL_USER')
 port = 5432
 db_path = f'postgresql://{user}:{password}@{host}:{port}/{db_name}'
+db_path0 = f'postgresql://{user}:{password}@{host}:{port}/{db_name2}'
 
 db = SQLAlchemy()
 
 def setup_psql(app, database_path=db_path):
-    app.config['SQLALCHEMY_DATABASE_URI']=db_path
+    app.config['SQLALCHEMY_DATABASE_URI']=database_path
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=False
     db.app = app
     db.init_app(app)
     db.create_all()
-
+    
 class Usuario(db.Model):
     __tablenamme__= 'usuario'
     id = db.Column(db.Integer, primary_key = True, nullable=True)
@@ -112,6 +115,7 @@ class Administrador(db.Model):
 
     def format(self):
         return{
+            "userid": self.id,
             "rol": "administrador",
             "area": self.area
         }
@@ -156,6 +160,7 @@ class Alumno(db.Model):
 
     def format(self):
         return {
+            "userid":self.id,
             "rol": "alumno",
             "ciclo": self.ciclo,
             "carrera":self.carrera
