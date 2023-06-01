@@ -298,9 +298,7 @@ def update_perfil(user_id):
         abort(422)
 
 
-app.errorhandler(404)
-
-
+@app.errorhandler(404)
 def not_found(error):
     return jsonify({
         'success': False,
