@@ -110,7 +110,7 @@ def unprocessable(error):
 def bad_request(error):
     return jsonify({
         "success": False,
-        "statusCode": error.code,
+        "statusCode": 400,
         "message": "bad request"
     }), 400
 
