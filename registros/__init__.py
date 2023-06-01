@@ -171,7 +171,7 @@ def create_app(db_path=db_path):
                 if body.get("area") != "":
                     admin.area = body.get("area")
             
-            if body.get("nombres") == "" and body.get("apellidos") == "" and body.get("correo") == "" and body.get("celular") == "" and body.get("password") == "" and body.get("area") == "":
+            if body.get("nombres") == "" or body.get("apellidos") == "" or body.get("correo") == "" or body.get("celular") == "" or body.get("password") == "" or body.get("area") == "":
                 abort(422)
 
             user.update()
@@ -185,7 +185,7 @@ def create_app(db_path=db_path):
                 if body.get("carrera") != "":
                     alumno.carrera = body.get("carrera")
             
-            if body.get("nombres") == "" and body.get("apellidos") == "" and body.get("correo") == "" and body.get("celular") == "" and body.get("password") == "" and body.get("ciclo") == "" and body.get("carrera") == "":
+            if body.get("nombres") == "" or body.get("apellidos") == "" or body.get("correo") == "" or body.get("celular") == "" or body.get("password") == "" or body.get("ciclo") == "" or body.get("carrera") == "":
                 abort(422)
 
             user.update()
@@ -241,7 +241,7 @@ def create_app(db_path=db_path):
             abort(404)
         
         return jsonify({
-            "sucess": True,
+            "success": True,
             "perfil": perfil.format()
         })
 
@@ -254,6 +254,9 @@ def create_app(db_path=db_path):
             abort(404)
 
         body = request.get_json()
+
+        if len(body) == 0:
+            abort(422)
 
         if "emociones" in body:
             if body.get("emociones") != "":
@@ -268,7 +271,7 @@ def create_app(db_path=db_path):
             if body.get("P3") != "":
                 perfil.P3 = body.get("P1")
 
-        if body.get('emociones') == "" and body.get("P1") == "" and body.get("P2") == ""and body.get("P3") == "":
+        if body.get('emociones') == "" or body.get("P1") == "" or body.get("P2") == "" or body.get("P3") == "":
             abort(422)
         
         perfil.update()

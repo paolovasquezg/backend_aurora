@@ -113,3 +113,63 @@ class TestRegistros(unittest.TestCase):
         response = self.client().patch('/update_user/'+str(self.admin_id), json={})
         data = response.get_json()
         self.assertEqual(data['statusCode'], 422)
+
+    def test_update_user_existing_email(self):
+        response = self.client().patch('/update_user/'+str(self.admin_id), json={"correo":self.new_alumno['correo']})
+        data = response.get_json()
+        self.assertEqual(data['statusCode'], 422)
+
+    def test_update_user_existing_body_incomplete_alumno(self):
+        response = self.client().patch('/update_user/'+str(self.admin_id), json={"correo":""})
+        data = response.get_json()
+        self.assertEqual(data['statusCode'], 422)
+
+    def test_update_user_existing_body_incomplete_admin(self):
+        response = self.client().patch('/update_user/'+str(self.admin_id), json={"area":""})
+        data = response.get_json()
+        self.assertEqual(data['statusCode'], 422)
+
+    def test_delete_user_success_alumno(self):
+        response = self.client().delete('/delete_user/'+str(self.alumno_id))
+        data = response.get_json()
+        self.assertEqual(data['success'], True)
+    
+    def test_delete_user_success_admin(self):
+        response = self.client().delete('/delete_user/'+str(self.admin_id))
+        data = response.get_json()
+        self.assertEqual(data['success'], True)
+
+    def test_delete_user_invalid_user(self):
+        response = self.client().delete('/delete_user/0')
+        data = response.get_json()
+        self.assertEqual(data['statusCode'], 404)
+
+    def test_get_perfil_success(self):
+        response = self.client().get('/get_perfil/'+str(self.alumno_id))
+        data = response.get_json()
+        self.assertEqual(data['success'], True)
+    
+    def test_get_perfil_invalid_user(self):
+        response = self.client().get('/get_perfil/0')
+        data = response.get_json()
+        self.assertEqual(data['statusCode'], 404)
+
+    def test_update_perfil_sucess(self):
+        response = self.client().patch('/update_perfil/'+str(self.alumno_id), json = {"emociones": "felicidad"})
+        data = response.get_json()
+        self.assertEqual(data['success'], True)
+
+    def test_update_perfil_invalid_user(self):
+        response = self.client().patch('/update_perfil/0', json = {"emociones": "felicidad"})
+        data = response.get_json()
+        self.assertEqual(data['statusCode'], 404)
+    
+    def test_update_perfil_not_body(self):
+        response = self.client().patch('/update_perfil/'+str(self.alumno_id), json = {})
+        data = response.get_json()
+        self.assertEqual(data['statusCode'], 422)
+
+    def test_update_perfil_invalid_body(self):
+        response = self.client().patch('/update_perfil/'+str(self.alumno_id), json={"emociones":""})
+        data = response.get_json()
+        self.assertEqual(data['statusCode'], 422)
