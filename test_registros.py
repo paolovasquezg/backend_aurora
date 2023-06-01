@@ -14,18 +14,13 @@ class TestRegistros(unittest.TestCase):
         self.app = create_app(db_path0)
         self.client = self.app.test_client
 
-        letters = string.ascii_lowercase
-        correo1 = ''.join(random.choice(letters) for l in range(50))
-        correo2 = ''.join(random.choice(letters) for l in range(50))
-        correo3 = ''.join(random.choice(letters) for l in range(50))
-        correo4 = ''.join(random.choice(letters) for l in range(50))
+        self.letters = string.ascii_lowercase
+        correo1 = ''.join(random.choice(self.letters) for l in range(50))
+        correo2 = ''.join(random.choice(self.letters) for l in range(50))
 
         self.new_alumno = {"nombres": "Paolo", "apellidos": "Vasquez", "correo": correo1, "celular": "+51983108669", "password": "1234", "role": "alumno", "ciclo": "5", "carrera": "CS", "emociones": "depresion","P1": "xd1","P2": "xd2","P3": "xd3"}
         self.new_admin = {"nombres": "Paolo", "apellidos": "Vasquez", "correo": correo2, "celular": "+51983108669","password": "1234","role": "administrador", "area": "jefatura"}
         
-        self.new_alumno_ex = {"nombres": "Paolo", "apellidos": "Vasquez", "correo": correo3, "celular": "+51983108669", "password": "1234", "role": "alumno", "ciclo": "5", "carrera": "CS", "emociones": "depresion","P1": "xd1","P2": "xd2","P3": "xd3"}
-        self.new_admin_ex = {"nombres": "Paolo", "apellidos": "Vasquez", "correo": correo4, "celular": "+51983108669","password": "1234","role": "administrador", "area": "jefatura"}
-
         temp1 = self.client().post("/signup", json=self.new_alumno)
         self.alumno_id = json.loads(temp1.data)['user_id']
 
@@ -53,12 +48,16 @@ class TestRegistros(unittest.TestCase):
         self.assertEqual(data["statusCode"], 404)
     
     def test_signup_alumno(self):
-        response = self.client().post('/signup', json=self.new_alumno_ex)
+        correo = ''.join(random.choice(self.letters) for l in range(50))
+        alumno = {"nombres": "Paolo", "apellidos": "Vasquez", "correo": correo, "celular": "+51983108669", "password": "1234", "role": "alumno", "ciclo": "5", "carrera": "CS", "emociones": "depresion","P1": "xd1","P2": "xd2","P3": "xd3"}
+        response = self.client().post('/signup', json=alumno)
         data = response.get_json()
         self.assertEqual(data['success'],True)
 
     def test_signup_admin(self):
-        response = self.client().post('/signup', json=self.new_alumno_ex)
+        correo = ''.join(random.choice(self.letters) for l in range(50))
+        admin = {"nombres": "Paolo", "apellidos": "Vasquez", "correo": correo, "celular": "+51983108669","password": "1234","role": "administrador", "area": "jefatura"}
+        response = self.client().post('/signup', json=admin)
         data = response.get_json()
         self.assertEqual(data['success'], True)
 
@@ -91,3 +90,26 @@ class TestRegistros(unittest.TestCase):
         response = self.client().get('/get_user/0')
         data = response.get_json()
         self.assertEqual(data["statusCode"], 404)
+    
+    def test_update_user_success_alumno(self):
+        correo = ''.join(random.choice(self.letters) for l in range(50))
+        response = self.client().patch('/update_user/'+str(self.alumno_id), json={"correo":correo,"ciclo":"5"})
+        data = response.get_json()
+        self.assertEqual(data['success'], True)
+
+    def test_update_user_success_admin(self):
+        correo = ''.join(random.choice(self.letters) for l in range(50))
+        response = self.client().patch('/update_user/'+str(self.admin_id), json={"correo":correo,"area":"recursos humanos"})
+        data = response.get_json()
+        self.assertEqual(data['success'], True)
+    
+    def test_update_user_invalid_user(self):
+        correo = ''.join(random.choice(self.letters) for l in range(50))
+        response = self.client().patch('/update_user/0', json={"correo":correo,"area":"recursos humanos"})
+        data = response.get_json()
+        self.assertEqual(data['statusCode'], 404)
+    
+    def test_update_user_not_body(self):
+        response = self.client().patch('/update_user/'+str(self.admin_id), json={})
+        data = response.get_json()
+        self.assertEqual(data['statusCode'], 422)

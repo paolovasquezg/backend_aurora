@@ -130,12 +130,16 @@ def create_app(db_path=db_path):
 
     @app.route("/update_user/<user_id>", methods = ["PATCH"])
     def update_user(user_id):
+
         user = Usuario.query.filter(Usuario.id == user_id).one_or_none()
 
         if user is None:
             abort(404)
 
         body = request.get_json()
+
+        if len(body) == 0:
+            abort(422)
 
         correo = body.get("correo",None)
 
