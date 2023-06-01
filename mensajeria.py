@@ -108,11 +108,12 @@ def send_context(user_id):
         "statusCode": response["statusCode"]
     })
   
+
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({
         'success': False,
-        'code': 404,
+        'statusCode': 404,
         'message': 'resource not found'
     }), 404
 
@@ -121,7 +122,7 @@ def not_found(error):
 def server_error(error):
     return jsonify({
         'success': False,
-        'code': 500,
+        'statusCode': 500,
         'message': 'Internal Server error'
     }), 500
 
@@ -130,9 +131,10 @@ def server_error(error):
 def unprocessable(error):
     return jsonify({
         'success': False,
-        'code': 422,
+        'statusCode': 422,
         'message': 'Unprocessable'
     }), 422
+
 
 @app.errorhandler(400)
 def bad_request(error):
