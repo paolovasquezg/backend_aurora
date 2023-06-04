@@ -18,7 +18,7 @@ psycopg2-binary==2.9.6
 pushbullet.py==0.9.1
 pycodestyle==2.10.0
 pymongo==4.3.3
-python_jenkins==1.8.0 urllib3<2.0.2
+python_jenkins==1.8.0
 python-dotenv==1.0.0
 python-magic==0.4.27
 requests==2.31.0
