@@ -21,7 +21,6 @@ pymongo==4.3.3
 python_jenkins==1.8.0
 python-dotenv==1.0.0
 python-magic==0.4.27
-pyOpenSSL==23.2.0
 requests==2.31.0
 six==1.16.0
 SQLAlchemy==2.0.15
