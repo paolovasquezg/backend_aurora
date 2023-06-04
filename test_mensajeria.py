@@ -8,10 +8,12 @@ from flask import Flask
 import json
 import random
 import string
+import time
 
 class TestMensajeria(unittest.TestCase):
     
     def setUp(self):
+        time.sleep(7)
         self.app = app_r(db_path0)
         self.client = self.app.test_client
 
