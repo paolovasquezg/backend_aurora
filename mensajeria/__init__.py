@@ -10,7 +10,7 @@ import requests
 def create_app(db_path=db_path):
     app = Flask(__name__)
     with app.app_context():
-        setup_psql(app, db_path)
+        setup_psql(app,db_path)
     CORS(app, origin="*")
 
     @app.route("/enviar_recibir/<user_id>", methods = ["POST"])
