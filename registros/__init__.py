@@ -72,7 +72,7 @@ def create_app(db_path=db_path):
                 abort(422)
             else:
                 new_user_id = usuario.insert()
-                administrador = Administrador(id=new_user_id, area=area)
+                administrador = Administrador(user_id=new_user_id, area=area)
                 administrador.insert()
 
         else:
