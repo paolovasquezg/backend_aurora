@@ -29,7 +29,7 @@ def create_app(db_path=db_path):
         
         return jsonify({
             "success": True,
-            "user_id": user.id
+            "user_id": user.user_id
         })
 
     @app.route("/signup", methods = ["POST"])
@@ -38,21 +38,27 @@ def create_app(db_path=db_path):
 
         if body is None:
             abort(422)
+
+        role = body.get('role', None)
         
         nombres = body.get('nombres', None)
         apellidos = body.get('apellidos', None)
         correo = body.get('correo', None)
         celular = body.get('celular', None)
         password = body.get('password', None)
-        role = body.get('role', None)
 
         area = body.get('area', None)
+
+        sexo = body.get('sexo', None)
         ciclo = body.get('ciclo', None)
         carrera = body.get('carrera', None)
+
         emociones = body.get('emociones', None)
-        P1 = body.get('P1', None)
-        P2 = body.get('P2', None)
-        P3 = body.get('P3', None)
+        asistirpsi = body.get('asistirpsi', None)
+        condicionSM = body.get('condSM', None)
+        difEst = body.get('difEst', None)
+        expect = body.get('expect', None)
+        estAni = body.get('estAni', None)
         
 
         user = Usuario.query.filter(Usuario.correo == correo).one_or_none()
@@ -70,13 +76,13 @@ def create_app(db_path=db_path):
                 administrador.insert()
 
         else:
-            if nombres is None or apellidos is None or correo is None or celular is None or password is None or ciclo is None or carrera is None or emociones is None or P1 is None or P2 is None or P3 is None:
+            if nombres is None or apellidos is None or correo is None or celular is None or password is None or sexo is None or ciclo is None or carrera is None or emociones is None or asistirpsi is None or condicionSM is None or difEst is None or expect is None or estAni is None:
                 abort(422)
             else:
                 new_user_id = usuario.insert()
-                alumno = Alumno(id=new_user_id, ciclo=ciclo, carrera=carrera)
+                alumno = Alumno(user_id=new_user_id, sexo=sexo, ciclo=ciclo, carrera=carrera)
                 new_alumno_id = alumno.insert()
-                perfil = Perfil(userid=new_alumno_id,emociones=emociones,P1=P1,P2=P2,P3=P3)
+                perfil = Perfil(user_id=new_alumno_id,emociones=emociones,asistirpsicologo=asistirpsi,condicionSM=condicionSM,difEst=difEst, expectativas=expect, estadoAnimico=estAni)
                 perfil.insert()
 
         return jsonify({
@@ -103,19 +109,20 @@ def create_app(db_path=db_path):
             abort(404)
 
         return jsonify({
-            'success': True
+            'success': True,
+            "user_id": user.user_id
         })
 
     @app.route("/get_user/<user_id>", methods = ['GET'])
     def get_user(user_id):
 
-        user = Usuario.query.filter(Usuario.id == user_id).one_or_none()
+        user = Usuario.query.filter(Usuario.user_id == user_id).one_or_none()
         
         if user is None:
             abort(404)
 
-        alumno = Alumno.query.filter(Alumno.id == user.id).one_or_none()
-        administrador = Administrador.query.filter(Administrador.id==user.id).one_or_none()
+        alumno = Alumno.query.filter(Alumno.user_id == user.user_id).one_or_none()
+        administrador = Administrador.query.filter(Administrador.user_id==user.user_id).one_or_none()
 
         if alumno is not None:
             especifico = alumno.format()
@@ -131,7 +138,7 @@ def create_app(db_path=db_path):
     @app.route("/update_user/<user_id>", methods = ["PATCH"])
     def update_user(user_id):
 
-        user = Usuario.query.filter(Usuario.id == user_id).one_or_none()
+        user = Usuario.query.filter(Usuario.user_id == user_id).one_or_none()
 
         if user is None:
             abort(404)
@@ -144,7 +151,7 @@ def create_app(db_path=db_path):
         correo = body.get("correo",None)
 
         existing_user = Usuario.query.filter(Usuario.correo == correo).one_or_none()
-        if existing_user is not None:
+        if (existing_user is not None) & (existing_user.user_id != user.user_id):
             abort(422)
 
         if "nombres" in body:
@@ -163,8 +170,8 @@ def create_app(db_path=db_path):
             if body.get("password") != "":
                 user.password = body.get("password")
 
-        admin = Administrador.query.filter(Administrador.id == user_id).one_or_none()
-        alumno = Alumno.query.filter(Alumno.id == user_id).one_or_none()
+        admin = Administrador.query.filter(Administrador.user_id == user_id).one_or_none()
+        alumno = Alumno.query.filter(Alumno.user_id == user_id).one_or_none()
 
         if admin is not None:
             if "area" in body:
@@ -178,6 +185,9 @@ def create_app(db_path=db_path):
             admin.update()
 
         else:
+            if "sexo" in body:
+                if body.get("sexo") != "":
+                    alumno.sexo = body.get("sexo")
             if "ciclo" in body:
                 if body.get("ciclo") != "":
                     alumno.ciclo = body.get("ciclo")
@@ -185,7 +195,7 @@ def create_app(db_path=db_path):
                 if body.get("carrera") != "":
                     alumno.carrera = body.get("carrera")
             
-            if body.get("nombres") == "" or body.get("apellidos") == "" or body.get("correo") == "" or body.get("celular") == "" or body.get("password") == "" or body.get("ciclo") == "" or body.get("carrera") == "":
+            if body.get("nombres") == "" and body.get("apellidos") == "" and body.get("correo") == "" and body.get("celular") == "" and body.get("password") == "" and body.get("sexo") == "" and body.get("ciclo") == "" and body.get("carrera") == "":
                 abort(422)
 
             user.update()
@@ -193,19 +203,19 @@ def create_app(db_path=db_path):
 
         return jsonify({
             'success': True,
-            "id": user_id
+            "user_id": user_id
         })
 
     @app.route("/delete_user/<user_id>", methods = ["DELETE"])
     def delete_user(user_id):
 
-        user = Usuario.query.filter(Usuario.id == user_id).one_or_none()
+        user = Usuario.query.filter(Usuario.user_id == user_id).one_or_none()
 
         if user is None:
             abort(404)
 
         sesions = []
-        query = {"AlumnoID": user.id}
+        query = {"AlumnoID": user.user_id}
         result = sesion.find(query)
 
         for r in result:
@@ -216,26 +226,26 @@ def create_app(db_path=db_path):
         for id in sesions:
             message.delete_many({"SessionID":id})
 
-        admin = Administrador.query.filter(Administrador.id == user_id).one_or_none()
-        alumno = Alumno.query.filter(Alumno.id == user_id).one_or_none()
+        admin = Administrador.query.filter(Administrador.user_id == user_id).one_or_none()
+        alumno = Alumno.query.filter(Alumno.user_id == user_id).one_or_none()
 
         if admin is not None:
             admin.delete()
             user.delete()
         else:
-            perfil = Perfil.query.filter(Perfil.userid == user_id).one_or_none()
+            perfil = Perfil.query.filter(Perfil.user_id == user_id).one_or_none()
             perfil.delete()
             alumno.delete()
             user.delete()
 
         return jsonify({
             "success":True,
-            "deleted": user_id
+            "deleted_user": user_id
         })
 
     @app.route("/get_perfil/<user_id>", methods = ["GET"])
     def get_perfil(user_id):
-        perfil = Perfil.query.filter(Perfil.userid==user_id).one_or_none()
+        perfil = Perfil.query.filter(Perfil.user_id==user_id).one_or_none()
 
         if perfil is None:
             abort(404)
@@ -248,7 +258,7 @@ def create_app(db_path=db_path):
     @app.route("/update_perfil/<user_id>", methods= ["PATCH"])
     def update_perfil(user_id):
 
-        perfil = Perfil.query.filter(Perfil.userid == user_id).one_or_none()
+        perfil = Perfil.query.filter(Perfil.user_id == user_id).one_or_none()
 
         if perfil is None:
             abort(404)
@@ -261,25 +271,31 @@ def create_app(db_path=db_path):
         if "emociones" in body:
             if body.get("emociones") != "":
                 perfil.emociones = body.get("emociones")
-        if "P1" in body:
-            if body.get("P1") != "":
-                perfil.P1 = body.get("P1")
-        if "P2" in body:
-            if body.get("P2") != "":
-                perfil.P2 = body.get("P2")
-        if "P3" in body:
-            if body.get("P3") != "":
-                perfil.P3 = body.get("P1")
+        if "asistirpsi" in body:
+            if body.get("asistirpsi") != "":
+                perfil.asistirpsicologo = body.get("asistirpsi")
+        if "condSM" in body:
+            if body.get("condSM") != "":
+                perfil.condicionSM = body.get("condSM")
+        if "difEst" in body:
+            if body.get("difEst") != "":
+                perfil.difEst = body.get("difEst")
+        if "expect" in body:
+            if body.get("expect") != "":
+                perfil.expectativas = body.get("expect")
+        if "estAni" in body:
+            if body.get("estAni") != "":
+                perfil.estadoAnimico = body.get("estAni")
 
-        if body.get('emociones') == "" or body.get("P1") == "" or body.get("P2") == "" or body.get("P3") == "":
+        if body.get('emociones') == "" and body.get("asistirpsi") == "" and body.get("condSM") == "" and body.get("difEst") == "" and body.get("expect") == "" and body.get("estAni") == "":
             abort(422)
         
         perfil.update()
 
         return jsonify({
             'success': True,
-            "userid": perfil.userid,
-            "perfilid": perfil.id
+            "user_id": perfil.user_id,
+            "form_id": perfil.form_id
         })
 
 

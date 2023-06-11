@@ -26,7 +26,7 @@ def setup_psql(app, database_path=db_path):
     
 class Usuario(db.Model):
     __tablenamme__= 'usuario'
-    id = db.Column(db.Integer, primary_key = True, nullable=True)
+    user_id = db.Column(db.Integer, primary_key = True, nullable=True)
     nombres = db.Column(db.String(200), nullable=False)
     apellidos = db.Column(db.String(200), nullable=False)
     correo = db.Column(db.String(200), nullable=False, unique =True)
@@ -39,7 +39,7 @@ class Usuario(db.Model):
         try:
             db.session.add(self)
             db.session.commit()
-            return self.id
+            return self.user_id
         except Exception as e:
             db.session.rollback()
             print(e)
@@ -64,11 +64,11 @@ class Usuario(db.Model):
             db.session.close()
 
     def __repr__(self):
-        return f"User('{self.userid}', \nNombres:'{self.nombres}', \nApellidos:'{self.apellidos}', \nCorreo:'{self.correo}', \nCelular:'{self.celular}', \nPassword:'{self.password}')"
+        return f"User('{self.user_id}', \nNombres:'{self.nombres}', \nApellidos:'{self.apellidos}', \nCorreo:'{self.correo}', \nCelular:'{self.celular}', \nPassword:'{self.password}')"
 
     def format(self):
         return{
-            "userid": self.id,
+            "userid": self.user_id,
             "nombres": self.nombres,
             "apellidos": self.apellidos,
             "correo": self.correo,
@@ -79,14 +79,14 @@ class Usuario(db.Model):
 
 class Administrador(db.Model):
     __tablenamme__ = 'administrador'
-    id = db.Column(db.Integer, db.ForeignKey("usuario.id"),primary_key=True, nullable = False)
+    user_id = db.Column(db.Integer, db.ForeignKey("usuario.user_id"),primary_key=True, nullable = False)
     area = db.Column(db.String(200), nullable = False)
 
     def insert(self):
         try:
             db.session.add(self)
             db.session.commit()
-            return self.id
+            return self.user_id
         except Exception as e:
             db.session.rollback()
             print(e)
@@ -111,18 +111,19 @@ class Administrador(db.Model):
             db.session.close()
 
     def __repr__(self):
-        return f"Administrador('{self.id}', '{self.area}')"
+        return f"Administrador('{self.user_id}', '{self.area}')"
 
     def format(self):
         return{
-            "userid": self.id,
+            "user_id": self.user_id,
             "rol": "administrador",
             "area": self.area
         }
 
 class Alumno(db.Model):
     __tablename__ = "alumno"
-    id = db.Column(db.Integer, db.ForeignKey("usuario.id"),primary_key=True, nullable = False)
+    user_id = db.Column(db.Integer, db.ForeignKey("usuario.user_id"),primary_key=True, nullable = False)
+    sexo = db.Column(db.String(1), nullable = False)
     ciclo = db.Column(db.Integer, nullable = False)
     carrera = db.Column(db.String(200), nullable=False)
     perfil = db.relationship('Perfil', backref='usuario',lazy=True,cascade= "all, delete-orphan")
@@ -131,7 +132,7 @@ class Alumno(db.Model):
         try:
             db.session.add(self)
             db.session.commit()
-            return self.id
+            return self.user_id
         except Exception as e:
             db.session.rollback()
             print(e)
@@ -156,30 +157,33 @@ class Alumno(db.Model):
             db.session.close()
     
     def __repr__(self):
-        return f"Alumno('{self.id}', '{self.ciclo}', '{self.carrera}')"
+        return f"Alumno('{self.user_id}', '{self.sexo}','{self.ciclo}', '{self.carrera}')"
 
     def format(self):
         return {
-            "userid":self.id,
+            "user_id":self.user_id,
             "rol": "alumno",
+            "sexo": self.sexo,
             "ciclo": self.ciclo,
             "carrera":self.carrera
         }
 
 class Perfil(db.Model):
     __tablename__ = 'perfil'
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
-    userid = db.Column(db.Integer, db.ForeignKey("alumno.id"), primary_key=False)
+    form_id = db.Column(db.Integer, primary_key=True, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("alumno.user_id"), primary_key=False)
     emociones = db.Column(db.String(200), nullable=False)
-    P1 = db.Column(db.String(200), nullable=False)
-    P2 = db.Column(db.String(200), nullable=False)
-    P3 = db.Column(db.String(200), nullable=False)
+    asistirpsicologo = db.Column(db.Boolean, nullable = False)
+    condicionSM = db.Column(db.String(200), nullable = False)
+    difEst = db.Column(db.Boolean, nullable = False)
+    expectativas = db.Column(db.String(200), nullable = False)
+    estadoAnimico = db.Column(db.Integer, nullable = False)
 
     def insert(self):
         try:
             db.session.add(self)
             db.session.commit()
-            return self.id
+            return self.form_id
         except Exception as e:
             db.session.rollback()
             print(e)
@@ -204,15 +208,17 @@ class Perfil(db.Model):
             db.session.close()
 
     def __repr__(self):
-        return f"Perfil('{self.id}', \nUser:'{self.userid}', \nEmociones:'{self.emociones}', \nP1:'{self.P1}', \nP2:'{self.P2}', \nP3:'{self.P3}')"
+        return f"Perfil('{self.form_id}', \nUser:'{self.user_id}', \nEmociones:'{self.emociones}', \nAsistirPsicologo:'{self.asistirpsicologo}', \nCondicionSM:'{self.condicionSM}', \nDifEst:'{self.difEst}', \nExpectativas:'{self.expectativas}', \nEstadoAnimico:'{self.estadoAnimico}')"
     
     def format(self):
         return {
-            "perfilid": self.id,
-            "userid": self.userid,
+            "form_id": self.form_id,
+            "user_id": self.user_id,
             "emociones": self.emociones,
-            "P1": self.P1,
-            "P2": self.P2,
-            "P3": self.P3
+            "AsistirPsicologo": self.asistirpsicologo,
+            "CondicionSM": self.condicionSM,
+            "DifEst": self.difEst,
+            "Expectativas": self.expectativas,
+            "EstadoAnimico": self.expectativas
         }
 
