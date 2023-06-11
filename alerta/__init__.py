@@ -23,7 +23,7 @@ def create_app(db_path=db_path):
     @app.route("/enviar_alerta/<user_id>", methods=["POST"])
     def send_alert(user_id):
 
-        user = Usuario.query.filter(Usuario.id == user_id).one_or_none()
+        user = Usuario.query.filter(Usuario.user_id == user_id).one_or_none()
         
         if user is None:
             abort(404)
@@ -35,6 +35,27 @@ def create_app(db_path=db_path):
         if enviado is None:
             abort(422)
 
+        perfil = Perfil.query.filter(Perfil.user_id == user_id).one_or_none()
+        alumno = Alumno.query.filter(Alumno.user_id == user_id).one_or_none()
+
+        if alumno.sexo == "M":
+            sexo = "un joven universitario"
+        else:
+            sexo = "una joven universitaria"
+        
+        if perfil.asistirpsicologo == True:
+            psicologo = "Ya ha asistido al psicólogo"
+        else:
+            psicologo = "Nunca ha asistido al psicólogo"
+        
+        if perfil.difEst == True:
+            dif = "se siente abrumado y tiene dificultades para concentrarse en los estudios"
+        else:
+            dif = "no se siente abrumado y tampoco tiene dificultades para concentrarse en los estudios"
+        
+        context = "Eres un bot de salud mental para " + user.nombres + " " + user.apellidos + ", " + sexo + " de " + str(alumno.ciclo) + " ciclo de la carrera de " + alumno.carrera + " en Perú. " + psicologo + ". " + "Se le ha diagnosticado con: " + perfil.condicionSM + "; y últimamente ha estado sintiendo estas emociones: " + perfil.emociones + ". En las ultimas semanas ha tenido un estado anímico de " + str(perfil.estadoAnimico) + " de 10 y " + dif + ". Tiene como expectativas de conversar con este bot lo siguiente: " + perfil.expectativas + "." 
+        
+
         nombres = user.nombres
         apellidos = user.apellidos
         email = user.correo
@@ -43,7 +64,7 @@ def create_app(db_path=db_path):
         entrada = {"messages": [
             {
                 "role": "system",
-                "content": "Eres un bot de salud mental."
+                "content": context
             },
             {
                 "role": "user",
@@ -64,7 +85,7 @@ def create_app(db_path=db_path):
             date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
 
             alert = "El usuario " + nombres + " " + apellidos + " envio " + "'" + enviado + "' el " + \
-                    date_time + ". Porfavor contactarse a " + email + " o " + celular + "."
+                    date_time + ". Porfavor contactarse a " + email + " o " + celular + ". Dicho usuario ha sido diagnosticado con: " + perfil.condicionSM + "; y últimamente ha estado sintiendo estas emociones: " + perfil.emociones + "."
 
             pb = PushBullet(API_KEY)
             push = pb.push_note('ALERTA', alert)

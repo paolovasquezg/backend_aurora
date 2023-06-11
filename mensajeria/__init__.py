@@ -20,7 +20,7 @@ def create_app(db_path=db_path):
 
         body = request.get_json()
 
-        alumno = Alumno.query.filter(Alumno.id == user_id).one_or_none()
+        alumno = Alumno.query.filter(Alumno.user_id == user_id).one_or_none()
 
         enviado = body.get("content", None)
         sesionid = body.get("sesionid", None)
@@ -28,19 +28,40 @@ def create_app(db_path=db_path):
         if alumno is None or enviado is None or sesionid is None:
             abort(422)
 
+        user = Usuario.query.filter(Usuario.user_id == user_id).one_or_none()
+        perfil = Perfil.query.filter(Perfil.user_id == user_id).one_or_none()
+
+        if alumno.sexo == "M":
+            sexo = "un joven universitario"
+        else:
+            sexo = "una joven universitaria"
+        
+        if perfil.asistirpsicologo == True:
+            psicologo = "Ya ha asistido al psicólogo"
+        else:
+            psicologo = "Nunca ha asistido al psicólogo"
+        
+        if perfil.difEst == True:
+            dif = "se siente abrumado y tiene dificultades para concentrarse en los estudios"
+        else:
+            dif = "no se siente abrumado y tampoco tiene dificultades para concentrarse en los estudios"
+        
+        context = "Eres un bot de salud mental para " + user.nombres + " " + user.apellidos + ", " + sexo + " de " + str(alumno.ciclo) + " ciclo de la carrera de " + alumno.carrera + " en Perú. " + psicologo + ". " + "Se le ha diagnosticado con: " + perfil.condicionSM + "; y últimamente ha estado sintiendo estas emociones: " + perfil.emociones + ". En las ultimas semanas ha tenido un estado anímico de " + str(perfil.estadoAnimico) + " de 10 y " + dif + ". Tiene como expectativas de conversar con este bot lo siguiente: " + perfil.expectativas + "." 
+        
+
         result = sesion.find({"SessionID": sesionid})
         result = list(result)
 
         if len(result) == 0:
-            sesion.insert_one({"SessionID": sesionid, "AlumnoID": alumno.id,
-                            "Start": date_time, "Context": "Eres un bot de salud mental."})
+            sesion.insert_one({"SessionID": sesionid, "AlumnoID": alumno.user_id,
+                            "Start": date_time, "Context": context})
         
         message.insert_one({"SessionID": sesionid, "Role": "user", "Content": enviado})
 
         entrada = {"messages": [
             {
                 "role": "system",
-                "content": "Eres un bot de salud mental."
+                "content": context
             },
             {
                 "role": "user",
@@ -66,19 +87,39 @@ def create_app(db_path=db_path):
 
     @app.route("/enviar_contexto/<user_id>", methods = ["GET"])
     def send_context(user_id):
-        alumno = Alumno.query.filter(Alumno.id == user_id).one_or_none()
+        alumno = Alumno.query.filter(Alumno.user_id == user_id).one_or_none()
 
         if alumno is None:
             abort(404)
 
+        user = Usuario.query.filter(Usuario.user_id == user_id).one_or_none()
+        perfil = Perfil.query.filter(Perfil.user_id == user_id).one_or_none()
+
+        if alumno.sexo == "M":
+            sexo = "un joven universitario"
+        else:
+            sexo = "una joven universitaria"
+        
+        if perfil.asistirpsicologo == True:
+            psicologo = "Ya ha asistido al psicólogo"
+        else:
+            psicologo = "Nunca ha asistido al psicólogo"
+        
+        if perfil.difEst == True:
+            dif = "se siente abrumado y tiene dificultades para concentrarse en los estudios"
+        else:
+            dif = "no se siente abrumado y tampoco tiene dificultades para concentrarse en los estudios"
+        
+        context = "Eres un bot de salud mental para " + user.nombres + " " + user.apellidos + ", " + sexo + " de " + str(alumno.ciclo) + " ciclo de la carrera de " + alumno.carrera + " en Perú. " + psicologo + ". " + "Se le ha diagnosticado con: " + perfil.condicionSM + "; y ultimamente ha estado sintiendo estas emociones: " + perfil.emociones + ". En las ultimas semanas ha tenido un estado anímico de " + str(perfil.estadoAnimico) + " de 10 y " + dif + ". Tiene como expectativas de conversar con este bot lo siguiente: " + perfil.expectativas + "." 
+
         entrada = {"messages": [{
             "role": "system",
-            "content": "Eres un bot de salud mental."
+            "content": context
         }
         ]}
 
         sesions = []
-        query = {"AlumnoID": alumno.id}
+        query = {"AlumnoID": alumno.user_id}
         result = sesion.find(query)
 
         for r in result:
