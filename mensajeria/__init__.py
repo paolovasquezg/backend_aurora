@@ -100,18 +100,8 @@ def create_app(db_path=db_path):
         else:
             sexo = "una joven universitaria"
         
-        if perfil.asistirpsicologo == True:
-            psicologo = "Ya ha asistido al psicólogo"
-        else:
-            psicologo = "Nunca ha asistido al psicólogo"
-        
-        if perfil.difEst == True:
-            dif = "se siente abrumado y tiene dificultades para concentrarse en los estudios"
-        else:
-            dif = "no se siente abrumado y tampoco tiene dificultades para concentrarse en los estudios"
-        
-        context = "Eres un bot de salud mental para " + user.nombres + " " + user.apellidos + ", " + sexo + " de " + str(alumno.ciclo) + " ciclo de la carrera de " + alumno.carrera + " en Perú. " + psicologo + ". " + "Se le ha diagnosticado con: " + perfil.condicionSM + "; y ultimamente ha estado sintiendo estas emociones: " + perfil.emociones + ". En las ultimas semanas ha tenido un estado anímico de " + str(perfil.estadoAnimico) + " de 10 y " + dif + ". Tiene como expectativas de conversar con este bot lo siguiente: " + perfil.expectativas + "." 
-
+        context = "Eres un bot de salud mental para " + user.nombres + ", " + sexo + "de la carrera de " + alumno.carrera + " en Perú."
+    
         entrada = {"messages": [{
             "role": "system",
             "content": context

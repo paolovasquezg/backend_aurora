@@ -151,8 +151,9 @@ def create_app(db_path=db_path):
         correo = body.get("correo",None)
 
         existing_user = Usuario.query.filter(Usuario.correo == correo).one_or_none()
-        if (existing_user is not None) & (existing_user.user_id != user.user_id):
-            abort(422)
+        if existing_user is not None: 
+            if existing_user.user_id != user.user_id:
+                abort(422)
 
         if "nombres" in body:
             if body.get("nombres") != "":
@@ -195,7 +196,7 @@ def create_app(db_path=db_path):
                 if body.get("carrera") != "":
                     alumno.carrera = body.get("carrera")
             
-            if body.get("nombres") == "" and body.get("apellidos") == "" and body.get("correo") == "" and body.get("celular") == "" and body.get("password") == "" and body.get("sexo") == "" and body.get("ciclo") == "" and body.get("carrera") == "":
+            if body.get("nombres") == "" or body.get("apellidos") == "" or body.get("correo") == "" or body.get("celular") == "" or body.get("password") == "" or body.get("sexo") == "" or body.get("ciclo") == "" or body.get("carrera") == "":
                 abort(422)
 
             user.update()
@@ -287,7 +288,7 @@ def create_app(db_path=db_path):
             if body.get("estAni") != "":
                 perfil.estadoAnimico = body.get("estAni")
 
-        if body.get('emociones') == "" and body.get("asistirpsi") == "" and body.get("condSM") == "" and body.get("difEst") == "" and body.get("expect") == "" and body.get("estAni") == "":
+        if body.get('emociones') == "" or body.get("asistirpsi") == "" or body.get("condSM") == "" or body.get("difEst") == "" or body.get("expect") == "" or body.get("estAni") == "":
             abort(422)
         
         perfil.update()

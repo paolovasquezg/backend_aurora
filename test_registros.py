@@ -18,7 +18,7 @@ class TestRegistros(unittest.TestCase):
         correo1 = ''.join(random.choice(self.letters) for l in range(50))
         correo2 = ''.join(random.choice(self.letters) for l in range(50))
 
-        self.new_alumno = {"nombres": "Paolo", "apellidos": "Vasquez", "correo": correo1, "celular": "+51983108669", "password": "1234", "role": "alumno", "ciclo": "5", "carrera": "CS", "emociones": "depresion","P1": "xd1","P2": "xd2","P3": "xd3"}
+        self.new_alumno = {"nombres": "Paolo", "apellidos": "Vasquez", "correo": correo1, "celular": "+51983108669", "password": "1234", "role": "alumno", "sexo": "M", "ciclo": 5, "carrera": "CS", "emociones": "depresion","asistirpsi": True, "condSM": "Depresion","difEst": True, "expect": "mejorar", "estAni": 10}
         self.new_admin = {"nombres": "Paolo", "apellidos": "Vasquez", "correo": correo2, "celular": "+51983108669","password": "1234","role": "administrador", "area": "jefatura"}
         
         temp1 = self.client().post("/signup", json=self.new_alumno)
@@ -49,7 +49,7 @@ class TestRegistros(unittest.TestCase):
     
     def test_signup_alumno(self):
         correo = ''.join(random.choice(self.letters) for l in range(50))
-        alumno = {"nombres": "Paolo", "apellidos": "Vasquez", "correo": correo, "celular": "+51983108669", "password": "1234", "role": "alumno", "ciclo": "5", "carrera": "CS", "emociones": "depresion","P1": "xd1","P2": "xd2","P3": "xd3"}
+        alumno = {"nombres": "Paolo", "apellidos": "Vasquez", "correo": correo, "celular": "+51983108669", "password": "1234", "role": "alumno", "sexo": "M", "ciclo": 5, "carrera": "CS", "emociones": "depresion","asistirpsi": True, "condSM": "Depresion","difEst": True, "expect": "mejorar", "estAni": 10}
         response = self.client().post('/signup', json=alumno)
         data = response.get_json()
         self.assertEqual(data['success'],True)

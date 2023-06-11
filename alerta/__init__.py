@@ -22,6 +22,7 @@ def create_app(db_path=db_path):
 
     @app.route("/enviar_alerta/<user_id>", methods=["POST"])
     def send_alert(user_id):
+        time.sleep(5)
 
         user = Usuario.query.filter(Usuario.user_id == user_id).one_or_none()
         

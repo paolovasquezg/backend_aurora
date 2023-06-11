@@ -22,8 +22,8 @@ class TestMensajeria(unittest.TestCase):
         letters = string.ascii_lowercase
         correo = ''.join(random.choice(letters) for l in range(50))
 
-        new_alumno = {"nombres": "Paolo", "apellidos": "Vasquez", "correo": correo, "celular": "+51983108669", "password": "1234",
-                      "role": "alumno", "ciclo": "5", "carrera": "CS", "emociones": "depresion", "P1": "xd1", "P2": "xd2", "P3": "xd3"}
+        new_alumno = {"nombres": "Paolo", "apellidos": "Vasquez", "correo": correo, "celular": "+51983108669", "password": "1234", "role": "alumno", "sexo": "M",
+                      "ciclo": 5, "carrera": "CS", "emociones": "depresion", "asistirpsi": True, "condSM": "Depresion", "difEst": True, "expect": "mejorar", "estAni": 10}
 
         temp = self.client().post("/signup", json=new_alumno)
         self.alumno_id = json.loads(temp.data)['user_id']
