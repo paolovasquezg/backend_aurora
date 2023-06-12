@@ -1,4 +1,5 @@
 autopep8==2.0.2
+backoff==2.2.1
 blinker==1.6.2
 certifi==2023.5.7
 charset-normalizer==3.1.0
@@ -14,12 +15,14 @@ itsdangerous==2.1.2
 Jinja2==3.1.2
 jsonify==0.5
 MarkupSafe==2.1.2
+multi-key-dict==2.0.3
+pbr==5.11.1
 psycopg2-binary==2.9.6
 pushbullet.py==0.9.1
 pycodestyle==2.10.0
 pymongo==4.3.3
-python_jenkins==1.8.0
 python-dotenv==1.0.0
+python-jenkins==1.8.0
 python-magic==0.4.27
 requests==2.31.0
 six==1.16.0
