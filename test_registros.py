@@ -7,10 +7,12 @@ from flask import Flask
 import json
 import random
 import string
+import time
 
 class TestRegistros(unittest.TestCase):
 
     def setUp(self):
+        time.sleep(2)
         self.app = create_app(db_path0)
         self.client = self.app.test_client
 
