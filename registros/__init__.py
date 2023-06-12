@@ -2,6 +2,7 @@ from psql import *
 from mongodb import *
 from flask_cors import CORS
 from flask import Flask, request, abort,jsonify
+import hashlib
 
 def create_app(db_path=db_path):
     app = Flask(__name__)
@@ -46,6 +47,9 @@ def create_app(db_path=db_path):
         correo = body.get('correo', None)
         celular = body.get('celular', None)
         password = body.get('password', None)
+
+        password = hashlib.md5(password.encode())
+        password = str(password.hexdigest())
 
         area = body.get('area', None)
 
@@ -102,6 +106,9 @@ def create_app(db_path=db_path):
 
         if correo is None or password is None:
             abort(404)
+        
+        password = hashlib.md5(password.encode())
+        password = str(password.hexdigest())
 
         user = Usuario.query.filter((Usuario.correo == correo) & (Usuario.password == password)).one_or_none()
 
